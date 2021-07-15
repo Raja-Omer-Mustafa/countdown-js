@@ -5,6 +5,8 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
   <body>
+    <!-- timer class is must don't forget to add -->
+    <!-- id should be passed in init function in js -->
     <div id="clockremaining_1" class="timer"></div>
     <div id="clockremaining_2" class="timer"></div>
     <div id="clockremaining_3" class="timer"></div>
