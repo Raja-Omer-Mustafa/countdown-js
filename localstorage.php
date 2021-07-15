@@ -5,6 +5,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   </head>
   <body>
+    <button id="clear-storage" type="button">clear storage!</button>
     <!-- timer class is must don't forget to add -->
     <!-- id should be passed in init function in js -->
     <div id="clockremaining_1" class="timer"></div>
@@ -14,6 +15,7 @@
 <script>
 
 $(document).ready(function() {
+    var staticDate = '<?php echo date('Y-m-d H:i:s');?>', staticExpDate = '<?php echo strtotime(date('2021-07-16 12:00:00')); ?>', staticNow = '<?php echo time();?>';
     var debug = false;
     function init(id){
         var hasdID = `#${id}`, data = [];
@@ -23,15 +25,17 @@ $(document).ready(function() {
         else {
             data[id] = {
                 timercounter: 0,
-                date: '<?php echo date('Y-m-d H:i:s');?>',
-                exp_date: '<?php echo strtotime(date('2021-07-16 12:00:00')); ?>',
-                now: '<?php echo time();?>'
+                date: staticDate,
+                exp_date: staticExpDate,
+                now: staticNow
             };
             localStorage.setItem(id, JSON.stringify(data[id]));
         }
+        if (debug)
+            console.log(data);
         var isActive = true;
         function settimedauctioncountdowndiv(){
-          alert("settimedauctioncountdowndiv function called - date=" + data[id].date + " - exp_date=" + data[id].exp_date+ " - now=" + data[id].now);
+          // alert("settimedauctioncountdowndiv function called - date=" + data[id].date + " - exp_date=" + data[id].exp_date+ " - now=" + data[id].now);
           if (data[id].now < data[id].exp_date) {
             var server_end = data[id].exp_date * 1000;
             var server_now = data[id].now * 1000;
@@ -100,6 +104,10 @@ $(document).ready(function() {
     init('clockremaining_2');
     init('clockremaining_3');
     init('clockremaining_4');
+    $( "#clear-storage" ).click(function() {
+        localStorage.clear();
+        location.reload();
+    });
 });
 </script>
 </body>
