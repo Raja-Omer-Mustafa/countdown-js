@@ -14,7 +14,7 @@
         <br />
         <strong>You can get timezone from user and set</strong>
     </div>
-    <button id="clear-storage" type="button">clear storage!</button>
+    <button id="clear-storage" style="display: none" type="button">clear storage!</button>
     <!-- timer class is must don't forget to add -->
     <!-- id should be passed in init function in js -->
     <div id="clockremaining_1" class="timer"></div>
@@ -24,43 +24,44 @@
 <script>
 
 $(document).ready(function() {
-    
-    var debug = true;
+    // $( "#clear-storage" ).trigger( "click" );
+    var debug = false, isActive = false;
+    var data = [];
 
 
-    function settimedauctioncountdowndiv(id, exp_date){
-        console.log(exp_date);
+    function settimedauctioncountdowndiv(bidlotid, exp_date){
+        if (debug)
+            console.log(exp_date);
 
         var staticDate = '<?php echo date('Y-m-d H:i:s');?>';
         var staticNow = '<?php echo time();?>';
 
-        var hasdID = `#${id}`, data = [];
-        if (localStorage.hasOwnProperty(id)) {
-            data[id] = JSON.parse(localStorage.getItem(id));
+        var hasdID = `#${bidlotid}`;
+        if (localStorage.hasOwnProperty(bidlotid)) {
+            data[bidlotid] = JSON.parse(localStorage.getItem(bidlotid));
         }
         else {
-            data[id] = {
+            data[bidlotid] = {
                 timercounter: 0,
                 date: staticDate,
                 exp_date: exp_date,
                 now: staticNow
             };
-            localStorage.setItem(id, JSON.stringify(data[id]));
+            localStorage.setItem(bidlotid, JSON.stringify(data[bidlotid]));
         }
         if (debug)
             console.log(data);
-        var isActive = true;
-        // alert("settimedauctioncountdowndiv function called - date=" + data[id].date + " - exp_date=" + data[id].exp_date+ " - now=" + data[id].now);
-        if (data[id].now < data[id].exp_date) {
-            var server_end = data[id].exp_date * 1000;
-            var server_now = data[id].now * 1000;
+        // alert("settimedauctioncountdowndiv function called - date=" + data[bidlotid].date + " - exp_date=" + data[bidlotid].exp_date+ " - now=" + data[bidlotid].now);
+        if (data[bidlotid].now < data[bidlotid].exp_date) {
+            var server_end = data[bidlotid].exp_date * 1000;
+            var server_now = data[bidlotid].now * 1000;
             var _second = 1000;
             var _minute = _second * 60;
             var _hour = _minute * 60;
             var _day = _hour *24
             var timer;
             function showRemaining() {
-                var distance = (server_end - server_now)  - (1000*data[id].timercounter);
+                var distance = (server_end - server_now)  - (1000*data[bidlotid].timercounter);
                 if (distance < 0 ) {
                     clearInterval( timer );
                     $(hasdID).html('<span style="color:#000;">Lot Finished</span>');
@@ -82,11 +83,11 @@ $(document).ready(function() {
                 console.log("Works");
                 $(hasdID).html(countdowninnerHTML);
                 if (isActive) {
-                    data[id].timercounter=data[id].timercounter+1;
-                    localStorage.setItem(id, JSON.stringify(data[id]));
+                    data[bidlotid].timercounter=data[bidlotid].timercounter+1;
+                    localStorage.setItem(bidlotid, JSON.stringify(data[bidlotid]));
                 }
                 else {
-                    data[id].timercounter=data[id].timercounter+1;
+                    data[bidlotid].timercounter=data[bidlotid].timercounter+1;
                 }
                 if (debug)
                     console.log(isActive);
@@ -107,22 +108,38 @@ $(document).ready(function() {
 
     window.addEventListener("storage", function myFunction(event) {
         $( "div.timer" ).each(function( index ) {
-            var id = $( this ).attr( "id" )
-            data[id] = JSON.parse(localStorage.getItem(id));
-            data[id].timercounter = parseInt(data[id].timercounter);
+            var id = $( this ).attr( "id" );
+            if (localStorage.hasOwnProperty(id)) {
+                data[id] = JSON.parse(localStorage.getItem(id));
+                data[id].timercounter = parseInt(data[id].timercounter);
+            }
+            else {
+                location.reload();
+            }
+            
         });
+        // if (!localStorage.hasOwnProperty('isActive')) {
+        //     isActive = localStorage.getItem('isActive');
+        // }
     });
     $(window).focus(function() {
+        console.log("Focus");
+        // localStorage.setItem('isActive', true);
         isActive = true;
         if (debug)
             console.log("Focus");
     });
     $(window).blur(function() {
-        isActive = false
+        // localStorage.setItem('isActive', false);
+        isActive = false;
         if (debug)
             console.log("Blur");
     });
     $( "#clear-storage" ).click(function() {
+        localStorage.clear();
+        location.reload();
+    });
+    $(window).bind('beforeunload',function(){
         localStorage.clear();
         location.reload();
     });
